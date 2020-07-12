@@ -16,6 +16,10 @@ module.exports = {}
 
 Por padrão o babel-plugin-root-import, para usar na importação o `~/` para se referenciar a /src, por padrão isso não funciona ao jest.
 
+```js
+import App from '~/App'
+```
+
 Criaremos um jsconfig.json, para o vscode não se perder nas importações.
 
 ```json

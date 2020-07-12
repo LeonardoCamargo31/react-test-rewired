@@ -1,5 +1,5 @@
-import App from '~/App'
+// import App from '~/App'
 
-test('example', ()=>{
-  expect(2+2).toBe(4)
+test('example', () => {
+  expect(2 + 2).toBe(4)
 })
