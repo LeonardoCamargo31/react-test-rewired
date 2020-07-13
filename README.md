@@ -59,3 +59,13 @@ import '@testing-library/jest-dom/extend-expect'
 
 ...os testes
 ```
+
+Debug
+
+```js
+const { getByText, getByTestId, debug } = render(<Component/>)
+    fireEvent.click(getByText('Adicionar'))
+
+    debug()
+
+```
