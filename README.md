@@ -47,7 +47,7 @@ npm i -D @testing-library/react @testing-library/jest-dom @types/jest
 
 `setupFilesAfterEnv`: Uma lista de arquivos para chamar depois que o ambiente de teste estiver configurado.
 
-E adicionamos o `@testing-library/react/cleanup-after-each`, pois como nossos testes precisam ter um DOM ficticia, depois de cada um dos testes ele vai limpar essa DOM. Se não essa dom, iria ficar incrementando a cada teste.
+E adicionamos o `@testing-library/react/cleanup-after-each`, pois como nossos testes precisam ter um DOM fictícia, depois de cada um dos testes ele vai limpar essa DOM. Se não essa dom, iria ficar incrementando a cada teste.
 
 `@testing-library/jest-dom/extend-expect` basicamente para aplicar as regras do jest-dom para extender as funcionalidades do jest em todos os testes. Se não teria que chamar em todos os testes essa lib. Pr exemplo:
 
@@ -60,7 +60,15 @@ import '@testing-library/jest-dom/extend-expect'
 ...os testes
 ```
 
-Debug
+### Clique no botão
+
+```js
+// <button>Adicionar</button> usar o getByText
+
+fireEvent.click(getByText('Adicionar'))
+```
+
+### Debug
 
 ```js
 const { getByText, getByTestId, debug } = render(<Component/>)
@@ -69,3 +77,72 @@ const { getByText, getByTestId, debug } = render(<Component/>)
     debug()
 
 ```
+
+### Evento change
+
+```js
+// no nosso html deve ter o htmlFor, o texto e input id
+/*
+  <label htmlFor="tech">Tech</label>
+  <input
+    type="text"
+    id="tech"
+    value={newTech}
+    onChange={(e) => e.target.value}
+  />
+*/
+
+fireEvent.change(getByLabelText('Tech'), { target: { value: 'Node.js' } })
+```
+
+```js
+<ul data-testid="name"></ul>
+
+const ul = getByTestId('tech-list')
+```
+
+### cleanup
+
+Ele basicamente limpa o DOM
+
+Exemplo:
+
+```js
+const render1 = render(<TechList />)
+
+fireEvent.change(render1.getByLabelText('Tech'), {
+  target: { value: 'Node.js' },
+})
+fireEvent.submit(render1.getByTestId('tech-form'))
+
+cleanup()
+
+const render2 = render(<TechList />)
+
+const ul = render2.getByTestId('tech-list')
+const li = render2.getByText('Node.js')
+expect(ul).toContainElement(li)
+```
+
+### jest-localstorage-mock
+
+Ele vai sobrepor o localstorage do jest
+
+### toHaveBeenCalledWith
+
+Garantir que uma função foi chamada com tais parâmetros
+
+```js
+expect(localStorage.setItem).toHaveBeenCalledWith(
+  'techs',
+  JSON.stringify(['Node.js'])
+)
+```
+
+## Redux
+
+Precisamos deixar nosso teste totalmente isolado, para ser um teste unitário.
+
+Usando o `jest.mock('react-redux')`, nosso componente não uso mais o redux e react-redux normal, passam a ser funções fictícias criadas pelo teste.
+
+Agora precisamos mockar as funções usadas no componente.
