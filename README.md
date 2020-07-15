@@ -146,3 +146,25 @@ Precisamos deixar nosso teste totalmente isolado, para ser um teste unitário.
 Usando o `jest.mock('react-redux')`, nosso componente não uso mais o redux e react-redux normal, passam a ser funções fictícias criadas pelo teste.
 
 Agora precisamos mockar as funções usadas no componente.
+
+## Criando mock de uma função
+
+```js
+it('shold be able to add new tech', () => {
+  const { getByTestId, getByLabelText } = render(<TechList />)
+
+  // função mock
+  const dispatch = jest.fn()
+  // alterar o retorno, quero que retorne nossa função mock
+  useDispatch.mockReturnValue(dispatch)
+
+  fireEvent.change(getByLabelText('Tech'), { target: { value: 'Node.js' } })
+  fireEvent.submit(getByTestId('tech-form'))
+
+  // espero que meu dispatch tenha sido chamado com tal valor
+  expect(dispatch).toHaveBeenCalledWith({
+    type: 'ADD_TECH',
+    payload: { tech: 'Node.js' },
+  })
+})
+```
