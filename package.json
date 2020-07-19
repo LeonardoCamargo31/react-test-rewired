@@ -23,13 +23,19 @@
     "setupFilesAfterEnv": [
       "@testing-library/jest-dom/extend-expect",
       "jest-localstorage-mock"
-    ]
+    ],
+    "collectCoverageFrom": [
+      "!src/index.js",
+      "!src/services/api.js"
+    ],
+    "coverageDirectory": "src/__tests__/coverage"
   },
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
-    "eject": "react-app-rewired eject"
+    "eject": "react-app-rewired eject",
+    "coverage": "react-app-rewired test --coverage --watchAll=false"
   },
   "browserslist": {
     "production": [

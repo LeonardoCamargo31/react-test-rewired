@@ -213,3 +213,11 @@ Assim lá no meu saga, quando chamar a API teremos o resultado mock:
 const response = yield call(api.get, 'techs')
 console.log(response) // ['Node.js']
 ```
+
+## Coverage
+
+**coverageDirectory**: Onde vamos salvar nosso arquivo de Coverage.
+
+Essa flag **--watchAll=false** para não ficar observando as alterações.
+
+**collectCoverageFrom**: !file para remover arquivos que não acho necessário testa-los.
