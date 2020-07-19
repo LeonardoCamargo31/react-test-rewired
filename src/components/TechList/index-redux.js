@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { addTech } from '../../store/modules/techs/action'
+import { addTech } from '../../store/modules/techs/actions'
 
 export default function TechList() {
   const [newTech, setNewTech] = useState([])

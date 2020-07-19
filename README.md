@@ -1,3 +1,5 @@
+# Teste com react
+
 ## Configuração
 
 Usando o `create-react-app` vem o react-scripts já trás uma configuração com jest. Assim por padrão não vamos conseguir modificar muitas coisas na configuração do jest.
@@ -12,7 +14,7 @@ Aqui no caso não modificamos nada.
 module.exports = {}
 ```
 
-### moduleNameMapper
+### Entenda o moduleNameMapper
 
 Por padrão o babel-plugin-root-import, para usar na importação o `~/` para se referenciar a /src, por padrão isso não funciona ao jest.
 
@@ -33,6 +35,8 @@ Criaremos um jsconfig.json, para o vscode não se perder nas importações.
 }
 ```
 
+## Dependências de teste
+
 Usaremos duas libs
 
 ```terminal
@@ -47,6 +51,10 @@ npm i -D @testing-library/react @testing-library/jest-dom @types/jest
 
 `setupFilesAfterEnv`: Uma lista de arquivos para chamar depois que o ambiente de teste estiver configurado.
 
+**Foi descontinuado o cleanup-after-each**
+
+*O módulo `@testing-library/react/cleanup-after-each` foi descontinuado e não faz mais nada (não é necessário). Você não precisa mais importar este módulo e pode remover com segurança qualquer importação ou configuração que importe esse módulo*
+
 E adicionamos o `@testing-library/react/cleanup-after-each`, pois como nossos testes precisam ter um DOM fictícia, depois de cada um dos testes ele vai limpar essa DOM. Se não essa dom, iria ficar incrementando a cada teste.
 
 `@testing-library/jest-dom/extend-expect` basicamente para aplicar as regras do jest-dom para extender as funcionalidades do jest em todos os testes. Se não teria que chamar em todos os testes essa lib. Pr exemplo:
@@ -60,7 +68,7 @@ import '@testing-library/jest-dom/extend-expect'
 ...os testes
 ```
 
-### Clique no botão
+## Clique no botão
 
 ```js
 // <button>Adicionar</button> usar o getByText
@@ -68,31 +76,33 @@ import '@testing-library/jest-dom/extend-expect'
 fireEvent.click(getByText('Adicionar'))
 ```
 
-### Debug
+## Debugar no meio do teste
 
 ```js
 const { getByText, getByTestId, debug } = render(<Component/>)
-    fireEvent.click(getByText('Adicionar'))
+fireEvent.click(getByText('Adicionar'))
 
-    debug()
+debug()
 
+// ...restante do teste
 ```
 
-### Evento change
+## Evento change
 
 ```js
 // no nosso html deve ter o htmlFor, o texto e input id
-/*
-  <label htmlFor="tech">Tech</label>
-  <input
-    type="text"
-    id="tech"
-    value={newTech}
-    onChange={(e) => e.target.value}
-  />
-*/
+<label htmlFor="tech">Tech</label>
+<input
+  type="text"
+  id="tech"
+  value={newTech}
+  onChange={(e) => e.target.value}
+/>
 
-fireEvent.change(getByLabelText('Tech'), { target: { value: 'Node.js' } })
+// no nosso teste
+fireEvent.change(getByLabelText('Tech'), {
+  target: { value: 'Node.js' }
+})
 ```
 
 ```js
@@ -101,7 +111,7 @@ fireEvent.change(getByLabelText('Tech'), { target: { value: 'Node.js' } })
 const ul = getByTestId('tech-list')
 ```
 
-### cleanup
+## Limpar o DOM
 
 Ele basicamente limpa o DOM
 
@@ -124,11 +134,11 @@ const li = render2.getByText('Node.js')
 expect(ul).toContainElement(li)
 ```
 
-### jest-localstorage-mock
+## Observando uma função
 
-Ele vai sobrepor o localstorage do jest
+Ele vai sobrepor o local storage do jest
 
-### toHaveBeenCalledWith
+## toHaveBeenCalledWith
 
 Garantir que uma função foi chamada com tais parâmetros
 
@@ -139,7 +149,7 @@ expect(localStorage.setItem).toHaveBeenCalledWith(
 )
 ```
 
-## Redux
+## Testes com Redux
 
 Precisamos deixar nosso teste totalmente isolado, para ser um teste unitário.
 
@@ -150,7 +160,7 @@ Agora precisamos mockar as funções usadas no componente.
 ## Criando mock de uma função
 
 ```js
-it('shold be able to add new tech', () => {
+it('should be able to add new tech', () => {
   const { getByTestId, getByLabelText } = render(<TechList />)
 
   // função mock
@@ -167,4 +177,39 @@ it('shold be able to add new tech', () => {
     payload: { tech: 'Node.js' },
   })
 })
+```
+
+## Testando Redux Saga
+
+Assim como no redux, não vamos configurar nada demais como store e etc. Vamos mockar também a chamada a API, assim interceptar essa chamada e retornar o valor esperado.
+
+O **runSaga** é responsável por rodar o saga.
+
+```js
+// função fake
+const dispatch = jest.fn()
+
+// toda vez que chamar o put, vamos chamar essa função mock
+// se passar o getState consigo mockar o select do saga
+await runSaga({ dispatch }, getTechs).toPromise()
+```
+
+## Mock na chamada a API
+
+Para que nosso teste fique isolado, e não dependa da API, precisamos criar um mock no axios, para isso instalamos a dependência `axios-mock-adapter`. O axios já tem esse pacote para ajudar dos testes, no teste com redux tivemos criar uma função mock.
+
+Depois de criada a API Mock:
+
+```js
+// todo método get é interceptado
+apiMock.onGet('rota')
+// a resposta desejada
+.reply(statusCode, data)
+```
+
+Assim lá no meu saga, quando chamar a API teremos o resultado mock:
+
+```js
+const response = yield call(api.get, 'techs')
+console.log(response) // ['Node.js']
 ```
